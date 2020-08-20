@@ -12,10 +12,12 @@ var Stack = function () {
   };
 
   someInstance.pop = function () {
+    var removed = someInstance.storage[someInstance.counter - 1];
+    delete someInstance.storage[someInstance.counter];
     if (someInstance.counter > 0) {
       someInstance.counter--;
     }
-    return someInstance.storage[someInstance.counter]; // confusion about why counter is previous number AFTER decrementing
+    return removed;
   };
 
   someInstance.size = function () {
