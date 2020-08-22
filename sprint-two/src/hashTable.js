@@ -20,7 +20,11 @@ HashTable.prototype.insert = function (k, v) {
     this._storage.set(index, ([[k, v]]));
   } else if (findTuple(bucket)) {
     var currentTuple = findTuple(bucket);
-    currentTuple[1] = v;
+    if (currentTuple[1] === v) {
+      return 'This key and value is already in the hash table';
+    } else {
+      currentTuple[1] = v;
+    }
   } else {
     this._storage.set(index, bucket.concat([[k, v]]));
   }

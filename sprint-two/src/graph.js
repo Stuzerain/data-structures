@@ -10,6 +10,9 @@ var Graph = function () {
 
 // Add a node to the graph, passing in the node's value.
 Graph.prototype.addNode = function (node) {
+  if (this.nodes[node]) {
+    return 'This node already exists';
+  }
   this.nodes[node] = node;
 };
 
@@ -51,9 +54,10 @@ Graph.prototype.hasEdge = function (fromNode, toNode) {
 // Connects two nodes in a graph by adding an edge between them.
 Graph.prototype.addEdge = function (fromNode, toNode) {
   // since graph is undirected, [to, from] should be functionally identical to [from, to], so this will check if either form of that edge exists before creating a new edge to avoid duplicate edges
-  if (this.edges[[toNode, fromNode]] === undefined && this.edges[[fromNode, toNode]] === undefined) {
-    this.edges[[fromNode, toNode]] = [fromNode, toNode];
+  if (this.edges[[toNode, fromNode]] !== undefined || this.edges[[fromNode, toNode]] !== undefined) {
+    return 'This edge already exists';
   }
+  this.edges[[fromNode, toNode]] = [fromNode, toNode];
 };
 
 // Remove an edge between any two specified (by value) nodes.
