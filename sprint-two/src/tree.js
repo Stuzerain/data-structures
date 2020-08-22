@@ -23,6 +23,20 @@ var treeMethods = {
     }
 
     return hasTarget > 0 ? true : false;
+  },
+
+  howMany: function (target) {
+    var hasTarget = 0;
+
+    if (this.value === target) {
+      hasTarget++;
+    }
+
+    for (var i = 0; i < this.children.length; i++) {
+      hasTarget += this.children[i].contains(target);
+    }
+
+    return hasTarget;
   }
 };
 
