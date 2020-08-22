@@ -7,62 +7,48 @@ var HashTable = function () {
 
 HashTable.prototype.insert = function (k, v) {
   var index = getIndexBelowMaxForKey(k, this._limit);
-  this._storage.set(index, [k, v]);
+  var bucket = this._storage.get(index);
+
+  var findTuple = function (buck) {
+    for (var i = 0; i < buck.length; i++) {
+      if (buck[i][0] === k) {
+        return buck[i];
+      }
+    }
+  };
+  if (bucket === undefined) {
+    this._storage.set(index, ([[k, v]]));
+  } else if (findTuple(bucket)) {
+    var currentTuple = findTuple(bucket);
+    currentTuple[1] = v;
+  } else {
+    this._storage.set(index, bucket.concat([[k, v]]));
+  }
 };
 
-//storage
-//  [[k1, v1], [k2, v2]]
+// v1, val1 => ... => [[v1, val1]]
+// v2, val2 => [[v1, val1]] => [[v1, val1], [v2, val2]]
+// v1, val3 => [[v1, val1], [v2, val2]] =>[[v1, val3], [v2, val2]]
 
-
-/*
-limitedArray.set = function (index, value) {
-    checkLimit(index);
-    if (storage[index] !== undefined) {
-      storage[index].push(value);
-    } else {
-      storage[index] = [value];
-    }
-    console.log(storage);
-  };
-
-
-storage = [
-  [[val1, val1], [val2, val2]],
-  [val4, val4]
-]
-*/
-
-// callback(storage[i], i, storage);
 
 HashTable.prototype.retrieve = function (k) {
   var index = getIndexBelowMaxForKey(k, this._limit);
-  var pair = this._storage.get(index);
-  if (pair.length === 1) {
-    return pair[0][1];
-  } else {
-    return this._storage.each(findKey);
-  }
+  var bucket = this._storage.get(index);
 
-  // helper function to find key in tuples
-  var findKey = function (value, ind, storage) {
-    // if current index is equal to given index in retrieve (line 38)
-    if (ind === index) {
-      // then iterate with .each to go over each key
+  var findValue = function (buck) {
+    for (var i = 0; i < buck.length; i++) {
+      if (buck[i][0] === k) {
+        return buck[i][1];
+      }
     }
   };
-};
-/*
-{
-  [k1, v1],
-  [k2, v2],
-  [k3, v3]
-  ],
 
-  [
-  [k4, v4]
-  ],
-}
-*/
+  if (bucket !== undefined) {
+    return findValue(bucket);
+  }
+
+  return undefined;
+};
 
 HashTable.prototype.remove = function (k) {
   var index = getIndexBelowMaxForKey(k, this._limit);
@@ -76,76 +62,11 @@ HashTable.prototype.remove = function (k) {
   this._storage.each(deleteKey);
 };
 
-/*
-[[1, 1]] => [[2, 2]]
-
-this._storage.set(storage.concat([[2, 2]])) => [[1, 1], [2, 2]]
-
- var LimitedArray = function(limit) {
-  var storage = [];
-
-  var limitedArray = {};
-  limitedArray.get = function(index) {
-    checkLimit(index);
-    return storage[index];
-  };
-  limitedArray.set = function(index, value) {
-    checkLimit(index);
-    storage[index] = value;
-  };
-  limitedArray.each = function(callback) {
-    for (var i = 0; i < storage.length; i++) {
-      callback(storage[i], i, storage);
-    }
-  };
-
-  var checkLimit = function(index) {
-    if (typeof index !== 'number') {
-      throw new Error('setter requires a numeric index for its first argument');
-    }
-    if (limit <= index) {
-      throw new Error('Error trying to access an over-the-limit index');
-    }
-  };
-
-  return limitedArray;
-};
-*/
 
 /*
  * Complexity: What is the time complexity of the above functions?
+   HashTable: constant
+   insert: linear because it has to iterate through a whole bucket in worst case, but practically constant because a good hash table will be so well distributed that no bucket would ever be that full
+   retrieve: linear but again practically constant for the same reasons as insertion
+   remove: linear, since our implementation iterates through every bucket to check for the key value pair you are trying to remove--in a perfect hash table this would be linear but practically constant
  */
-
-
-// [                              ]   outer array
-//  []  []  []   []   []   []   []     buckets
-//  [[], []]                                   tuples
-/*
-
-HashTable = {
-  _.limit: 8,
-  _.storage: [[t[0][1], t, t, t], [t, t, t, t], [], [], [], [], [], []]
-}
-*/
-
-
-/* attempt at insertion with original .set method
-// if storage is already occupied, don't insert
-  if (this._storage.get(index) === undefined) {
-    this._storage.set(index, [[k, v]])
-  // check if the given k is present
-
-  //} else if (this._storage.get(index)[0] === k && this._storage.get(index)[1] !== v) {
-    // access the index
-      // check each element in the index
-        // if the current key matches the given k
-          // overwrite the value with the current v
-
-  //} else {
-    //var bucket = this._storage.get(index);
-    //console.log(bucket);
-    //this._storage.set(index, bucket.concat([[k, v]]));
-    //console.log(this._storage);
-  }
-  */
-
